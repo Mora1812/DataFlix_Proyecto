@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataFlix - Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS del Dashboard -->
+  <link rel="stylesheet" href="/static/dashboard/style.css">
+  
+  <!-- FontAwesome para iconos simples -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js para los gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="small-logo"></div>
+        <h2>Data<span>Flix</span></h2>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <a href="#" class="menu-item" data-section="inicio">
+          <i class="fa-solid fa-house"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#" class="menu-item active" data-section="dashboard">
+          <i class="fa-solid fa-chart-simple"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="menu-item" data-section="cargar">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Cargar archivo</span>
+        </a>
+        <a href="#" class="menu-item" data-section="explorar">
+          <i class="fa-solid fa-compass"></i>
+          <span>Explorar datos</span>
+        </a>
+        <a href="#" class="menu-item" data-section="peliculas">
+          <i class="fa-solid fa-film"></i>
+          <span>Películas</span>
+        </a>
+        <a href="#" class="menu-item" data-section="series">
+          <i class="fa-solid fa-tv"></i>
+          <span>Series</span>
+        </a>
+        <a href="#" class="menu-item" data-section="reportes">
+          <i class="fa-solid fa-file-invoice"></i>
+          <span>Reportes</span>
+        </a>
+        <a href="#" class="menu-item" data-section="configuracion">
+          <i class="fa-solid fa-gear"></i>
+          <span>Configuración</span>
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <a href="#" class="menu-item logout-btn" onclick="logout()">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Cerrar sesión</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <div class="main-content">
+      
+      <!-- TOP HEADER -->
+      <header class="main-header">
+        <div class="header-left">
+          <button class="toggle-sidebar-btn">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+        <div class="header-right">
+          <span class="user-name" id="headerUserName">Juan Pérez</span>
+          <div class="user-avatar">
+            <div class="avatar-dot"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT PANELS -->
+      <div class="content-body">
+        
+        <!-- SECTION: INICIO (PÁGINA BIENVENIDA) -->
+        <section id="section-inicio" class="content-section hidden">
+          <div class="welcome-card">
+            <h1>¡Bienvenido a <span class="highlight">DataFlix</span>!</h1>
+            <p>Tu plataforma moderna de análisis estadístico de contenido de streaming.</p>
+            <p class="guide-text">Comienza cargando un dataset en formato CSV o Excel para poblar el dashboard.</p>
+            <button class="btn-primary" onclick="switchSection('cargar')">Cargar Dataset Ahora</button>
+          </div>
+        </section>
+
+        <!-- SECTION: CARGAR ARCHIVO -->
+        <section id="section-cargar" class="content-section">
+          <div class="section-header">
+            <h2>Carga tu dataset</h2>
+            <p>Sube tu archivo CSV o Excel con información de películas y series.</p>
+          </div>
+
+          <!-- DROPZONE -->
+          <div class="upload-dropzone" id="dropzone">
+            <div class="dropzone-content">
+              <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+              <p class="drop-text">Arrastra y suelta tu archivo aquí o</p>
+              <label for="fileInput" class="btn-primary file-label">Subir Archivo</label>
+              <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display: none;" />
+              <p class="drop-formats">Formatos soportados: CSV, XLSX, XLS</p>
+            </div>
+          </div>
+
+          <div id="uploadStatus" class="upload-status"></div>
+
+          <!-- DATASET PREVIEW -->
+          <div class="preview-container card-panel hidden" id="previewContainer">
+            <h3>Vista previa del dataset</h3>
+            <div class="table-responsive">
+              <table class="preview-table" id="datasetTable">
+                <thead>
+                  <tr id="tableHeader"></tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+              </table>
+            </div>
+            
+            <!-- DATASET META BOXES -->
+            <div class="meta-row">
+              <div class="meta-card">
+                <span class="meta-title">Filas</span>
+                <span class="meta-value" id="metaRows">-</span>
+              </div>
+              <div class="meta-card">
+                <span class="meta-title">Columnas</span>
+                <span class="meta-value" id="metaCols">-</span>
+              </div>
+              <div class="meta-card">
+                <span class="meta-title">Valores nulos</span>
+                <span class="meta-value" id="metaNulls">-</span>
+              </div>
+              <div class="meta-card">
+                <span class="meta-title">Tamaño</span>
+                <span class="meta-value" id="metaSize">-</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: DASHBOARD -->
+        <section id="section-dashboard" class="content-section hidden">
+          
+          <!-- FILTERS HEADER -->
+          <div class="dashboard-filter-header">
+            <div>
+              <h2>Dashboard de Estadísticas</h2>
+              <p>Visualización interactiva y análisis de datos.</p>
+            </div>
+            <div class="filter-controls">
+              <label for="platformFilter">Plataforma:</label>
+              <select id="platformFilter" onchange="applyFilters()">
+                <option value="Todos">Todos</option>
+              </select>
+              <label for="genreFilter">Género:</label>
+              <select id="genreFilter" onchange="applyFilters()">
+                <option value="Todos">Todos</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- TOP METRICS CARDS -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon-bg red-bg">F</div>
+              <div class="metric-info">
+                <span class="metric-label">Total películas y series</span>
+                <span class="metric-val" id="metricTotal">0</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-bg red-bg">R</div>
+              <div class="metric-info">
+                <span class="metric-label">Rating promedio</span>
+                <span class="metric-val" id="metricRating">0.0</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-bg red-bg">G</div>
+              <div class="metric-info">
+                <span class="metric-label">Género más frecuente</span>
+                <span class="metric-val" id="metricGenre">-</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-bg red-bg">N</div>
+              <div class="metric-info">
+                <span class="metric-label">Plataforma con contenido</span>
+                <span class="metric-val" id="metricPlatform">-</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-bg red-bg">Y</div>
+              <div class="metric-info">
+                <span class="metric-label">Año con más estrenos</span>
+                <span class="metric-val" id="metricYear">-</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon-bg red-bg">D</div>
+              <div class="metric-info">
+                <span class="metric-label">Duración promedio (min)</span>
+                <span class="metric-val" id="metricDuration">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CHARTS GRID -->
+          <div class="charts-grid">
+            
+            <!-- Bar Chart -->
+            <div class="chart-container-card span-8">
+              <h3>Cantidad de películas/series por género</h3>
+              <div class="chart-wrapper">
+                <canvas id="genreBarChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Donut Chart -->
+            <div class="chart-container-card span-4">
+              <h3>Distribución por plataforma</h3>
+              <div class="chart-wrapper">
+                <canvas id="platformDonutChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Line Chart -->
+            <div class="chart-container-card span-12">
+              <h3>Estrenos por año</h3>
+              <div class="chart-wrapper line-chart-wrapper">
+                <canvas id="yearLineChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Heatmap / Custom Grid -->
+            <div class="chart-container-card span-4">
+              <h3>Mapa de calor: Género vs Rating promedio</h3>
+              <div class="heatmap-container" id="heatmapContainer">
+                <div class="heatmap-axis-labels-x">
+                  <div>&lt;5</div>
+                  <div>5-6</div>
+                  <div>6-7</div>
+                  <div>7-8</div>
+                  <div>8-9</div>
+                  <div>&gt;9</div>
+                </div>
+                <div class="heatmap-grid" id="heatmapGrid"></div>
+                <div class="heatmap-legend">
+                  <span>Bajo rating</span>
+                  <div class="legend-bar"></div>
+                  <span>Alto rating</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Scatter Plot -->
+            <div class="chart-container-card span-4">
+              <h3>Presupuesto vs Ganancias</h3>
+              <div class="chart-wrapper">
+                <canvas id="scatterPlot"></canvas>
+              </div>
+            </div>
+
+            <!-- Top 10 Table -->
+            <div class="chart-container-card span-4">
+              <h3>Top 10 películas/series por rating</h3>
+              <div class="table-responsive">
+                <table class="top10-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Título</th>
+                      <th>Tipo</th>
+                      <th>Año</th>
+                      <th>Rating</th>
+                      <th>Votos</th>
+                    </tr>
+                  </thead>
+                  <tbody id="top10Body">
+                    <tr><td colspan="6" style="text-align: center; color: #666;">Carga un dataset para ver resultados</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Stats Summary List -->
+            <div class="chart-container-card span-12 stats-summary-panel">
+              <div class="stat-summary-col">
+                <h3>Resumen estadístico</h3>
+                <div class="stats-list">
+                  <div class="stat-list-item">
+                    <span>Media rating</span>
+                    <span id="summaryMeanRating">0.00</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Mediana rating</span>
+                    <span id="summaryMedianRating">0.00</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Desv. estándar</span>
+                    <span id="summaryStdRating">0.00</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Rating máximo</span>
+                    <span id="summaryMaxRating">0.00</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Rating mínimo</span>
+                    <span id="summaryMinRating">0.00</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Dur. prom.(min)</span>
+                    <span id="summaryMeanDuration">0</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Dur. max.(min)</span>
+                    <span id="summaryMaxDuration">0</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Dur. min.(min)</span>
+                    <span id="summaryMinDuration">0</span>
+                  </div>
+                </div>
+              </div>
+              <div class="stat-summary-col">
+                <h3>Información del dataset</h3>
+                <div class="stats-list">
+                  <div class="stat-list-item">
+                    <span>Filas</span>
+                    <span id="summaryRows">0</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Columnas</span>
+                    <span id="summaryCols">0</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Valores nulos</span>
+                    <span id="summaryNulls">0</span>
+                  </div>
+                  <div class="stat-list-item">
+                    <span>Memoria</span>
+                    <span id="summaryMemory">0 KB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- SECTION: EXPLORAR DATOS -->
+        <section id="section-explorar" class="content-section hidden">
+          <div class="section-header">
+            <h2>Explorar datos</h2>
+            <p>Navega por el dataset completo cargado. Busca cualquier título.</p>
+          </div>
+          <div class="catalog-toolbar">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="exploreSearch" placeholder="Buscar por título..." oninput="debounceExplore()" />
+            </div>
+            <span class="catalog-count" id="exploreTotalLabel">— registros</span>
+          </div>
+          <div class="card-panel" style="padding:0; overflow:hidden;">
+            <div class="table-responsive">
+              <table class="preview-table" id="exploreTable">
+                <thead><tr id="exploreHeader"></tr></thead>
+                <tbody id="exploreBody"><tr><td colspan="10" class="table-empty">Carga un dataset para explorar los datos.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="pagination-bar" id="explorePagination"></div>
+        </section>
+
+        <!-- SECTION: PELÍCULAS -->
+        <section id="section-peliculas" class="content-section hidden">
+          <div class="section-header">
+            <h2>Películas</h2>
+            <p>Catálogo completo de películas del dataset, ordenadas por rating.</p>
+          </div>
+          <div class="catalog-toolbar">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="moviesSearch" placeholder="Buscar película..." oninput="debounceMovies()" />
+            </div>
+            <div class="toolbar-filters">
+              <select id="moviesGenreFilter" onchange="loadCatalog('movie')">
+                <option value="Todos">Todos los géneros</option>
+              </select>
+              <select id="moviesPlatformFilter" onchange="loadCatalog('movie')">
+                <option value="Todos">Todas las plataformas</option>
+              </select>
+            </div>
+            <span class="catalog-count" id="moviesTotalLabel">— películas</span>
+          </div>
+          <div class="card-panel" style="padding:0; overflow:hidden;">
+            <div class="table-responsive">
+              <table class="preview-table catalog-table" id="moviesTable">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Título</th><th>Género</th><th>Año</th>
+                    <th>Rating</th><th>Duración</th><th>Plataforma</th><th>Votos</th>
+                  </tr>
+                </thead>
+                <tbody id="moviesBody">
+                  <tr><td colspan="8" class="table-empty">Carga un dataset para ver las películas.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="pagination-bar" id="moviesPagination"></div>
+        </section>
+
+        <!-- SECTION: SERIES -->
+        <section id="section-series" class="content-section hidden">
+          <div class="section-header">
+            <h2>Series</h2>
+            <p>Catálogo completo de series de televisión del dataset, ordenadas por rating.</p>
+          </div>
+          <div class="catalog-toolbar">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="seriesSearch" placeholder="Buscar serie..." oninput="debounceSeries()" />
+            </div>
+            <div class="toolbar-filters">
+              <select id="seriesGenreFilter" onchange="loadCatalog('series')">
+                <option value="Todos">Todos los géneros</option>
+              </select>
+              <select id="seriesPlatformFilter" onchange="loadCatalog('series')">
+                <option value="Todos">Todas las plataformas</option>
+              </select>
+            </div>
+            <span class="catalog-count" id="seriesTotalLabel">— series</span>
+          </div>
+          <div class="card-panel" style="padding:0; overflow:hidden;">
+            <div class="table-responsive">
+              <table class="preview-table catalog-table" id="seriesTable">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Título</th><th>Género</th><th>Año</th>
+                    <th>Rating</th><th>Duración</th><th>Plataforma</th><th>Votos</th>
+                  </tr>
+                </thead>
+                <tbody id="seriesBody">
+                  <tr><td colspan="8" class="table-empty">Carga un dataset para ver las series.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="pagination-bar" id="seriesPagination"></div>
+        </section>
+
+        <!-- SECTION: REPORTES -->
+        <section id="section-reportes" class="content-section hidden">
+          <div class="section-header">
+            <h2>Reportes</h2>
+            <p>Exporta los datos del dataset en distintos formatos y con filtros opcionales.</p>
+          </div>
+          <div class="reports-grid">
+            <!-- Exportar CSV -->
+            <div class="report-card">
+              <div class="report-icon" style="background: rgba(76,175,80,0.15); color: #4caf50;">
+                <i class="fa-solid fa-file-csv"></i>
+              </div>
+              <h3>Exportar como CSV</h3>
+              <p>Descarga el dataset completo (o filtrado) en formato CSV compatible con Excel y otras herramientas.</p>
+              <div class="report-filters">
+                <select id="csvTipoFilter"><option value="all">Todo el dataset</option><option value="Película">Solo Películas</option><option value="Serie">Solo Series</option></select>
+                <select id="csvGenreFilter"><option value="Todos">Todos los géneros</option></select>
+                <select id="csvPlatformFilter"><option value="Todos">Todas las plataformas</option></select>
+              </div>
+              <button class="btn-export btn-green" onclick="exportData('csv')">
+                <i class="fa-solid fa-download"></i> Descargar CSV
+              </button>
+            </div>
+
+            <!-- Exportar JSON -->
+            <div class="report-card">
+              <div class="report-icon" style="background: rgba(255,152,0,0.15); color: #ff9800;">
+                <i class="fa-solid fa-code"></i>
+              </div>
+              <h3>Exportar como JSON</h3>
+              <p>Descarga el dataset en formato JSON, ideal para integraciones con APIs y aplicaciones web.</p>
+              <div class="report-filters">
+                <select id="jsonTipoFilter"><option value="all">Todo el dataset</option><option value="Película">Solo Películas</option><option value="Serie">Solo Series</option></select>
+                <select id="jsonGenreFilter"><option value="Todos">Todos los géneros</option></select>
+                <select id="jsonPlatformFilter"><option value="Todos">Todas las plataformas</option></select>
+              </div>
+              <button class="btn-export btn-orange" onclick="exportData('json')">
+                <i class="fa-solid fa-download"></i> Descargar JSON
+              </button>
+            </div>
+
+            <!-- Resumen del dataset -->
+            <div class="report-card report-card-wide">
+              <div class="report-icon" style="background: rgba(33,150,243,0.15); color: #2196f3;">
+                <i class="fa-solid fa-chart-bar"></i>
+              </div>
+              <h3>Resumen del Dataset Cargado</h3>
+              <p>Información general sobre el archivo actualmente procesado.</p>
+              <div class="report-summary-grid" id="reportSummary">
+                <div class="report-stat"><span class="rs-label">Archivo</span><span class="rs-val" id="rptFilename">—</span></div>
+                <div class="report-stat"><span class="rs-label">Filas totales</span><span class="rs-val" id="rptRows">—</span></div>
+                <div class="report-stat"><span class="rs-label">Columnas</span><span class="rs-val" id="rptCols">—</span></div>
+                <div class="report-stat"><span class="rs-label">Valores nulos</span><span class="rs-val" id="rptNulls">—</span></div>
+                <div class="report-stat"><span class="rs-label">Tamaño en disco</span><span class="rs-val" id="rptSize">—</span></div>
+                <div class="report-stat"><span class="rs-label">Rating promedio</span><span class="rs-val" id="rptRating">—</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: CONFIGURACIÓN -->
+        <section id="section-configuracion" class="content-section hidden">
+          <div class="section-header">
+            <h2>Configuración</h2>
+            <p>Información de tu cuenta y ajustes del dataset.</p>
+          </div>
+          <div class="config-grid">
+            <!-- Perfil de usuario -->
+            <div class="config-card">
+              <div class="config-card-header">
+                <i class="fa-solid fa-user-circle"></i>
+                <h3>Perfil de usuario</h3>
+              </div>
+              <div class="config-body">
+                <div class="config-field">
+                  <label>Correo electrónico</label>
+                  <div class="config-value" id="cfgEmail">—</div>
+                </div>
+                <div class="config-field">
+                  <label>Nombre de usuario</label>
+                  <div class="config-value" id="cfgName">—</div>
+                </div>
+                <div class="config-field">
+                  <label>Sesión iniciada</label>
+                  <div class="config-value" id="cfgSession">Activa</div>
+                </div>
+                <button class="btn-primary" style="margin-top:16px; width:100%;" onclick="logout()">
+                  <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                </button>
+              </div>
+            </div>
+
+            <!-- Dataset activo -->
+            <div class="config-card">
+              <div class="config-card-header">
+                <i class="fa-solid fa-database"></i>
+                <h3>Dataset activo</h3>
+              </div>
+              <div class="config-body">
+                <div class="config-field">
+                  <label>Nombre del archivo</label>
+                  <div class="config-value" id="cfgDataset">Ninguno cargado</div>
+                </div>
+                <div class="config-field">
+                  <label>Filas cargadas</label>
+                  <div class="config-value" id="cfgRows">—</div>
+                </div>
+                <div class="config-field">
+                  <label>Columnas</label>
+                  <div class="config-value" id="cfgCols">—</div>
+                </div>
+                <div class="config-field">
+                  <label>Tamaño</label>
+                  <div class="config-value" id="cfgSize">—</div>
+                </div>
+                <button class="btn-secondary" style="margin-top:16px; width:100%;" onclick="switchSection('cargar')">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Cargar nuevo dataset
+                </button>
+              </div>
+            </div>
+
+            <!-- Columnas detectadas -->
+            <div class="config-card config-card-full">
+              <div class="config-card-header">
+                <i class="fa-solid fa-table-columns"></i>
+                <h3>Columnas detectadas en el dataset</h3>
+              </div>
+              <div class="config-body">
+                <div class="columns-chips" id="cfgColumns">
+                  <span class="chip-empty">Carga un dataset para ver las columnas detectadas.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/dashboard/script.js"></script>
+</body>
+</html>

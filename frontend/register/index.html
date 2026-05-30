@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataFlix - Registrarse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/register/style.css">
+</head>
+<body>
+  <main class="page">
+    <section class="left">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="brand">
+          <div class="film-logo"></div>
+          <h1>Data<span>Flix</span></h1>
+        </div>
+        <p id="leftText" class="description">
+          Plataforma de análisis estadístico <br />
+          para películas y series
+        </p>
+        <p id="leftSlogan" class="slogan">
+          Convierte datos de streaming en información visual.
+        </p>
+        <div class="dots" id="carouselDots">
+          <span class="active"></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="posters-container" id="postersContainer">
+          <button class="carousel-arrow prev" onclick="moveCarousel(-1)">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+            </svg>
+          </button>
+          <div class="posters-viewport">
+            <div id="posterRow" class="posters">
+              <div class="poster p1">
+                <span class="netflix-badge">N</span>
+                <span class="poster-title">INTERSTELLAR</span>
+              </div>
+              <div class="poster p2">
+                <span class="netflix-badge">N</span>
+                <span class="poster-title">LA CASA DE PAPEL</span>
+              </div>
+              <div class="poster p3">
+                <span class="netflix-badge">N</span>
+                <span class="poster-title">GAME OF THRONES</span>
+              </div>
+              <div class="poster p4">
+                <span class="netflix-badge">N</span>
+                <span class="poster-title">STRANGER THINGS</span>
+              </div>
+              <div class="poster p5">
+                <span class="netflix-badge">N</span>
+                <span class="poster-title">JOKER</span>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-arrow next" onclick="moveCarousel(1)">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+    <section class="right">
+      <div class="card">
+        <div class="small-brand">
+          <div class="small-logo"></div>
+          <p>Data<span>Flix</span></p>
+        </div>
+        <h2>Crear cuenta</h2>
+        <p id="formSubtitle">Regístrate para continuar</p>
+        
+        <!-- NOMBRE -->
+        <div class="input-group">
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
+            </svg>
+          </span>
+          <input id="name" type="text" placeholder="Nombre completo" required />
+        </div>
+
+        <!-- EMAIL -->
+        <div class="input-group">
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
+            </svg>
+          </span>
+          <input id="email" type="email" placeholder="Correo electrónico" required />
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="input-group">
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" fill="currentColor"/>
+            </svg>
+          </span>
+          <input id="password" type="password" placeholder="Contraseña" required />
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')">
+            <svg class="eye-icon" viewBox="0 0 24 24" width="18" height="18">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- CONFIRM PASSWORD -->
+        <div class="input-group">
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" fill="currentColor"/>
+            </svg>
+          </span>
+          <input id="confirmPassword" type="password" placeholder="Confirmar contraseña" required />
+        </div>
+
+        <!-- BOTÓN -->
+        <button onclick="submitForm()" id="mainBtn">Registrarse</button>
+        
+        <p id="message"></p>
+
+        <!-- CAMBIO A LOGIN -->
+        <p class="change">
+          <span>¿Ya tienes cuenta?</span>
+          <a href="/">Inicia sesión</a>
+        </p>
+
+        <small id="secureText">Conexión segura · SSL</small>
+      </div>
+    </section>
+  </main>
+  <script src="/static/register/script.js"></script>
+</body>
+</html>

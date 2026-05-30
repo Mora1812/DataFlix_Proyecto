@@ -1,0 +1,26 @@
+# Entorno virtual
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Base de datos local
+*.db
+
+# Archivos subidos
+uploads/
+
+# Node
+node_modules/
+package.json
+package-lock.json
+
+# Dataset de prueba
+test_dataset.xlsx
+
+# Sistema
+.DS_Store
+Thumbs.db
